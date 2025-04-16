@@ -5,7 +5,8 @@ services:
     region: ohio
     plan: free
     buildCommand: npm install
-    startCommand: npm run start:win
+    startCommand: |
+      npm run test:connection && npm run start:win
     envVars:
       - key: NODE_ENV
         value: production
