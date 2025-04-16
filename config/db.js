@@ -1,33 +1,34 @@
 const { Pool } = require("pg");
 require("dotenv").config();
 
-// Configuración más robusta para entornos de producción
+// Configuración de entorno
 const isProduction = process.env.NODE_ENV === 'production';
 console.log("Entorno:", isProduction ? "Producción" : "Desarrollo");
 console.log("Intentando conectar a:", process.env.DB_HOST);
 
-const connectionConfig = {
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  port: 5432,
-  ssl: {
+// Usar URI de conexión en lugar de objeto de configuración
+const connectionString = `postgres://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}:5432/${process.env.DB_NAME}`;
+console.log(`URI: ${connectionString.replace(/:[^:]*@/, ':***@')}`);
+
+const poolConfig = {
+  connectionString,
+  ssl: { 
     rejectUnauthorized: false,
+    checkServerIdentity: () => undefined // Deshabilita la verificación de identidad del servidor 
   },
+  connectionTimeoutMillis: 15000,
+  idleTimeoutMillis: 30000,
   allowExitOnIdle: true,
-  connectionTimeoutMillis: 10000, // 10 segundos para timeout
-  idleTimeoutMillis: 30000, // 30 segundos para timeout en idle
+  max: 5 // Limitar el número máximo de conexiones
 };
 
-console.log("Intentando conexión con configuración:", { ...connectionConfig, password: '***' });
+console.log("Configuración de conexión:", { ...poolConfig, ssl: { ...poolConfig.ssl } });
 
-// Intento con error mejorado
 let retries = 0;
 const MAX_RETRIES = 3;
 
 function connectWithRetry() {
-  const pool = new Pool(connectionConfig);
+  const pool = new Pool(poolConfig);
   
   // Manejo de errores inesperados
   pool.on('error', (err) => {
@@ -40,8 +41,17 @@ function connectWithRetry() {
   return pool.connect()
     .then((client) => {
       console.log("✅ Conectado a la base de datos");
-      client.release();
-      return pool;
+      // Realizar una consulta de prueba
+      return client.query('SELECT NOW() as time')
+        .then(res => {
+          console.log(`Fecha y hora del servidor: ${res.rows[0].time}`);
+          client.release();
+          return pool;
+        })
+        .catch(err => {
+          client.release();
+          throw err;
+        });
     })
     .catch((err) => {
       console.error(`❌ Error en intento #${retries + 1}:`, err.message);
@@ -53,7 +63,11 @@ function connectWithRetry() {
         return new Promise(resolve => setTimeout(() => resolve(connectWithRetry()), 3000));
       } else {
         console.error("Se agotaron los intentos de conexión a la base de datos");
-        process.exit(1);
+        
+        // No terminar el proceso, solo devolver un pool no conectado
+        // para que la aplicación pueda seguir funcionando
+        console.warn("Continuando sin conexión a base de datos");
+        return pool;
       }
     });
 }
