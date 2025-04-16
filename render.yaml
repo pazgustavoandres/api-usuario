@@ -2,19 +2,24 @@ services:
   - type: web
     name: api-usuario
     env: node
+    region: ohio
+    plan: free
     buildCommand: npm install
-    startCommand: npm start
+    startCommand: npm run start:win
     envVars:
+      - key: NODE_ENV
+        value: production
       - key: DB_HOST
-        sync: false
+        value: dpg-cvq6m0be5dus73f2vge0-a.oregon-postgres.render.com
       - key: DB_USER
-        sync: false
+        value: api_user_2qfc_user
       - key: DB_PASS
-        sync: false
+        value: 7WdQGXthhOqyYoHiaPQPKbnqL25LCYho
       - key: DB_NAME
-        sync: false
+        value: api_user_2qfc
       - key: JWT_SECRET
-        sync: false
+        value: supersecretkey
       - key: PORT
         value: 10000
+    healthCheckPath: /
     autoDeploy: true 
