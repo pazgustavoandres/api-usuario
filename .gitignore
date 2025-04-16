@@ -1,0 +1,20 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno
+.env
+
+# Archivos de build
+dist/
+build/
+
+# Configuración de editores
+.vscode/
+.idea/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# ⚠️ Ignorar archivos de configuración del proyecto
+ package-lock.json

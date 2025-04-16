@@ -1,0 +1,15 @@
+# Comando para conectar a PostgreSQL en Render
+
+# Parámetros correctos:
+# Host: dpg-cvq6m0be5dus73f2vge0-a.oregon-postgres.render.com
+# Nombre DB: api_user_2qfc
+# Usuario: api_user_2qfc_user
+# Contraseña: 7WdQGXthhOqyYoHiaPQPKbnqL25LCYho
+
+# Ejecuta este comando en PowerShell:
+psql "sslmode=require host=dpg-cvq6m0be5dus73f2vge0-a.oregon-postgres.render.com dbname=api_user_2qfc user=api_user_2qfc_user password=7WdQGXthhOqyYoHiaPQPKbnqL25LCYho"
+
+# Si el anterior no funciona, prueba este comando con las conexiones en formato separado:
+psql -h dpg-cvq6m0be5dus73f2vge0-a.oregon-postgres.render.com -d api_user_2qfc -U api_user_2qfc_user -W -p 5432 -c "SELECT 'Conexión exitosa' AS mensaje;"
+
+# Cuando se te solicite la contraseña, ingresa: 7WdQGXthhOqyYoHiaPQPKbnqL25LCYho 
