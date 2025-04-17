@@ -27,11 +27,11 @@ app.use(express.json());
 // Variable global para el estado de la conexión
 let dbConnected = false;
 
-// Configuramos las rutas ANTES de conectar a la BD para que siempre estén disponibles
-app.use("/api", authRoutes);
+// Configuramos las rutas directamente en la raíz - IMPORTANTE PARA FRONTEND
+app.use("/", authRoutes);
 
 // Ruta básica para verificar el estado del servidor
-app.get('/', (req, res) => {
+app.get('/status', (req, res) => {
   res.json({ 
     status: 'API funcionando correctamente', 
     environment: isProduction ? 'production' : 'development',
