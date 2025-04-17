@@ -1,0 +1,2 @@
+Este archivo se ha creado para forzar un redespliegue en Render.
+Fecha: 2025-04-16 
